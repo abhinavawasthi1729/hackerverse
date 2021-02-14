@@ -192,7 +192,7 @@
                 echo "error: $query <br> $db->error";  
               }
               
-              $team_check_query="select * from `hackerverse`.`signup` where teamName='$team'";
+              $team_check_query="select * from `hackerverse`.`signup` where Email='$email'";
                $result=mysqli_query($db,$team_check_query);
          
               
@@ -204,7 +204,7 @@
               }
               
               $password1=md5($password1);
-              $query="INSERT INTO `credentials`( `Sno`,`teamName`, `password`) VALUES ('$sno','$team','$password1')";
+              $query="INSERT INTO `credentials`( `Sno`,`email`, `password`) VALUES ('$sno','$email','$password1')";
               $result=mysqli_query($db,$query);
               if(!$result){
                 echo "credentials not inserted $db->error";
