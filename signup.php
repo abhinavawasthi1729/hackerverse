@@ -43,75 +43,37 @@
     </div>
   </div>
  
-     <?php
-       /*$con = mysqli_connect("localhost","root","");
-        $db=mysqli_select_db($con,"hackerverse");
-        $id;
-        if ($con) {
-            echo "connection successful";
-        }
-        else{
-          die('Could not connect: '.mysqli_errno());
-        }
-            if(isset($_POST["submit"]))
-            {
-                                
-                $institution=$_POST['colname'];
-                $teamName=$_POST['team'];
-                $name1=$_POST['mem1'];
-                $email_id=$_POST['email'];
-                $number1=$_POST['phone1'];
-                $number2=$_POST['phone2'];
-                $name2=$_POST['mem2'];
-                
-                
-                $name3=$_POST['mem3'];
-              
-                $name4=$_POST['mem4'];
-               
-                $name5=$_POST['mem5'];
-                
-                $query=mysqli_query($con,"Insert into `hackerverse`.`signup` ( `collgeName`, `teamName`, `teamMember1`, `Email`, `Phone1`, `Phone2`, `teamMember2`, `teamMember3`, `teamMember4`, `teamMember5`) values('$institution','$teamName','$name1','$email_id','$number1','$number2','$name2','$name3','$name4','$name5')");
-             
-                if($query)
-                {
-					echo "<script type = 'text/javascript'>alert('Registration Successful')</script>";
-					//echo "<script type='text/javascript'>window.location.assign('index.php')</script>";
-             }
-             else
-             {
-				echo "<script type = 'text/javascript'>alert('Registration Not Successful!! Please try again!')</script>";
-				//echo "<script type='text/javascript'>window.location.assign('index.php')</script>";
-                 echo "error: $query <br> $con->error";  
-             }
-            }*/
-
-        ?>
+    
 
 <?php
     session_start();
     //connect to DB
     $db=mysqli_connect('localhost','root','','hackerverse') ;
-    if (!$db) {
+    if ($db){
+      echo "connected to DB";
+    }
+    else {
       die('Could not connect: '.mysqli_errno());
       }
+
+      //registration
+      $par1="";
+      $par2="";
+      $par3="";
+      $par4="";
+      $par5="";
+
+      $team="";
+      $phone1="";
+      $phone2="";
+      $colname="";
+      $email="";
+      $password1="";
+      $password2="";
      
       if(isset($_POST['submit']))
       {
-          //registration
-          $par1="";
-          $par2="";
-          $par3="";
-          $par4="";
-          $par5="";
-
-          $team="";
-          $phone1="";
-          $phone2="";
-          $colname="";
-          $email="";
-          $password1="";
-          $password2="";
+          
 
           $par1=mysqli_real_escape_string($db,$_POST['mem1']);
           $par2=mysqli_real_escape_string($db,$_POST['mem2']);
@@ -158,18 +120,19 @@
         
           //check if teamName or email already exist
 
-          $team_check_query="select * from `hackerverse`.`signup` where collegeName='$colname' or Email='$email'";
+          $team_check_query="select * from `hackerverse`.`user_details` where collegeName='$colname' or email='$email'";
           $result=mysqli_query($db,$team_check_query);
          
-              $user=mysqli_fetch_assoc($result);
+              
 
-              if($user){
+              if($result){
+                $user=mysqli_fetch_assoc($result);
                   if($user['teamName']===$team){
                       array_push($errors,"Team name already exist");
                       //echo "<script type='text/javascript'> alert('Team name already exist') </script>";
                     }
 
-                  if($user['Email']===$email){
+                  if($user['email']===$email){
                       array_push($errors,"Email already exist");
                       //echo "<script type='text/javascript'> alert('Email already exist') </script>";
                       
@@ -180,7 +143,15 @@
 
           if(count($errors)==0){
               $password=md5($password1);
-              $query="INSERT INTO `hackerverse`.`signup`(`collegeName`, `teamName`, `teamMember1`, `Email`, `Phone1`, `Phone2`, `teamMember2`, `teamMember3`, `teamMember4`, `teamMember5`) VALUES ('$colname','$team','$par1','$email','$phone1','$phone2','$par2','$par3','$par4','$par5')";
+
+              $query="INSERT INTO `credentials`( `email`, `password`) VALUES ('$email','$password')";
+              $result=mysqli_query($db,$query);
+              if(!$result){
+                echo "credentials not inserted $db->error";
+              }
+              
+
+              $query="INSERT INTO `user_details`( `email`, `college`, `teamName`, `phone1`, `phone2`, `participant1`, `participant2`, `participant3`, `participant4`, `participant5`)VALUES ('$email','$colname','$team','$phone1','$phone2','$par1','$par2','$par3','$par4','$par5')";
               $result=mysqli_query($db,$query);
               if($result)
               {
@@ -191,28 +162,13 @@
                 echo "<script type = 'text/javascript'>alert('Registration Not Successful!! Please try again!')</script>";
                 echo "error: $query <br> $db->error";  
               }
+           
               
-              $team_check_query="select * from `hackerverse`.`signup` where Email='$email'";
-               $result=mysqli_query($db,$team_check_query);
-         
-              
-
-              if($result){
-                  $user=mysqli_fetch_assoc($result);
-                  $sno= $user['Sno'];
-                 // echo $sno;
-              }
-              
-              $password1=md5($password1);
-              $query="INSERT INTO `credentials`( `Sno`,`email`, `password`) VALUES ('$sno','$email','$password1')";
-              $result=mysqli_query($db,$query);
-              if(!$result){
-                echo "credentials not inserted $db->error";
-              }
-              
+            
+             
               $_SESSION['username']=$team;
               $_SESSION['success']="You are logged in";
-              //header("location:index.php");
+              header("location:index.php");
           }
           else{
                   echo "<strong> &nbsp;&nbsp;&nbsp;&nbsp; Errors : </strong> <br>";

@@ -34,7 +34,9 @@
       session_start();
       $db=mysqli_connect('localhost','root','','hackerverse') or die('can not connected to DB');
 
-     // if(isset($_POST['login'])){
+      $email="";
+      $password="";
+      if(isset($_POST['login'])){
             $email=mysqli_real_escape_string($db,$_POST['email']);
             $password=mysqli_real_escape_string($db,$_POST['password']);
 
@@ -57,11 +59,24 @@
                     else{
                       echo "logged in successfully";
                     }*/
+                    
+
 
                     if(mysqli_num_rows($result)){
                       $_SESSION['email']=$email;
                       $_SESSION['success']="you are successfully logged in";
-                      echo "log in successful";
+
+                      $query="SELECT * FROM `user_details` WHERE email='$email'";
+                      $result=mysqli_query($db,$query);
+                      if($result){
+                        $input=mysqli_fetch_assoc($result);
+                        if(isset($input)){
+                          $_SESSION['username']=$input['teamName'];
+                          echo $_SESSION['username'];
+                        }
+                      }
+
+                      header("location:index.php");
                    }
                    else{
                           array_push($errors,"incorrect email or password");
@@ -75,7 +90,7 @@
                
                 }
 
-     // }
+      }
       
       
 
